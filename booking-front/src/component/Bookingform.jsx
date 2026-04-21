@@ -12,15 +12,20 @@ export default function Form() {
   const [dateError, setdateError] = useState("");
 
   function isFormEmpty() {
+    let valid = true
     if (firstname.length === 0) {
       setFnError("FirstName's Empty!!");
+      valid = false
     }
     if (lastname.length === 0) {
       setLnError("Lastname's Empty!!");
+      valid = false
     }
     if (date.length === 0) {
       setdateError("Enter Date!!");
+      valid = false
     }
+    return valid
   }
 
   return (
@@ -34,10 +39,7 @@ export default function Form() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (firstname.length === 0 || lastname.length === 0) {
-              isFormEmpty();
-              return;
-            }
+            if(!isFormEmpty()) return 
             setBooking([...booking, { firstname, lastname, date }]);
             setFirstname("");
             setLastname("");
