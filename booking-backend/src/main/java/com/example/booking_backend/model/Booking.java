@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+//สร้างโครงข้อมูลให้ตรงกับ Database ที่มี 1Table/1file
 @Data
 @Entity
 @Table(name = "bookings")

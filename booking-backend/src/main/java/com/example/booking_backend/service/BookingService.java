@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.booking_backend.model.Booking;
 import com.example.booking_backend.repository.BookingRepository;
 
+//ตัวควบคุมและเรียกใช้งานคำสั่งและใส่ Logic ต่างๆ
 @Service
 public class BookingService {
     

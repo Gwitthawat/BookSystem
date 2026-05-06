@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Form() {
   const [firstname, setFirstname] = useState("");
@@ -6,27 +6,68 @@ export default function Form() {
   const [date, setDate] = useState("");
   const [booking, setBooking] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [fnError, setFnError] = useState("");
   const [lnError, setLnError] = useState("");
   const [dateError, setdateError] = useState("");
 
+  const url = 'http://localhost:8080/api/bookings'
+
+  //ใช้ตรวจสอบ โหลดข้อมูลเมื่อโหลดหน้า url ขึ้นมา
+useEffect(() => {
+    fetch(url)
+    .then(res => {
+        if (!res.ok) throw new Error('เชื่อมต่อ server ไม่ได้');
+        return res.json();
+    })
+    .then(data => {
+        setBooking(data);
+        setLoading(false);
+    })
+    .catch(err => {
+        setError(err.message);
+        setLoading(false);
+    })
+}, [])
+
+// ส่งข้อมูลที่กรอกจากหน้าเว็บไปยังหลังบ้าน
+function handleSubmit(e) {
+    e.preventDefault()
+    if (!isFormEmpty()) return
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstname, lastname, date })
+    })
+    .then(res => res.json())
+    .then(json => {
+        setBooking([...booking, json])
+        setFirstname('')
+        setLastname('')
+        setDate('')
+    })
+}
+//ตรวจสอบช่องฟอร์ม ข้อมูลถูกต้องหรือไม่
   function isFormEmpty() {
-    let valid = true
+    let valid = true;
     if (firstname.length === 0) {
       setFnError("FirstName's Empty!!");
-      valid = false
+      valid = false;
     }
     if (lastname.length === 0) {
       setLnError("Lastname's Empty!!");
-      valid = false
+      valid = false;
     }
     if (date.length === 0) {
       setdateError("Enter Date!!");
-      valid = false
+      valid = false;
     }
-    return valid
+    return valid;
   }
+//------------ คำสั่ง js รวมอยู่ใน front เพราะใช้แค่รอบเดียวในหน้าเดียวไม่มีการใช้ซ้ำ
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -37,14 +78,7 @@ export default function Form() {
         </h1>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if(!isFormEmpty()) return 
-            setBooking([...booking, { firstname, lastname, date }]);
-            setFirstname("");
-            setLastname("");
-            setDate("");
-          }}
+          onSubmit={handleSubmit}
           className="flex flex-col gap-4"
         >
           {/* ชื่อ - นามสกุล */}
@@ -105,15 +139,24 @@ export default function Form() {
           </button>
           <h1>รายการจอง</h1>
           <div className="border-2 p-2 rounded-lg border-gray-300">
-            {booking.length === 0 ? (
+            {loading ? (
+              <div className="flex item-center justify-center">
+                <p className="text-gray-400">กำลังโหลด...</p>
+              </div>
+            ) : error ? (
+              <div className="flex item-center justify-center">
+                <p className="text-red-500">{error}</p>
+              </div>
+            ) : booking.length === 0 ? (
               <div className="flex item-center justify-center">
                 <p className="text-gray-400">List's Empty</p>
               </div>
             ) : (
               booking.map((b, i) => (
-                <p key={i}>
-                  {i + 1}. {b.firstname} {b.lastname} <p></p> Date: {b.date}
-                </p>
+                <div key={i}>
+                  <p>{i + 1}. {b.firstname} {b.lastname}</p>
+                  <p>Date: {b.date}</p>
+                </div>
               ))
             )}
           </div>
