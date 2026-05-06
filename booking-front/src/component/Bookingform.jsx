@@ -38,7 +38,7 @@ function handleSubmit(e) {
 
     fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' }, //ให้ส่งข้อมูลไปรูปแบบ json
         body: JSON.stringify({ firstname, lastname, date })
     })
     .then(res => res.json())
